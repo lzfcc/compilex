@@ -1,3 +1,6 @@
+/**
+ * Created by lzf on 2016-04-27.
+ */
 var exec = require('child_process').exec;
 var fs = require('fs');
 var cuid = require('cuid');
@@ -5,32 +8,31 @@ var colors = require('colors');
 
 exports.stats = false;
 
-exports.compileCPP = function(envData, code, input, fn) {
+exports.compileC = function(envData, code, input, fn) {
 	var filename = cuid.slug();
 	path = './temp/';
 
 	//create temp0 
-	fs.writeFile(path + filename + '.cpp', code, function(err) {
+	fs.writeFile(path + filename + '.c', code, function(err) {
 		if (exports.stats) {
 			if (err) console.log('ERROR: '.red + err);
 			else {
-				console.log('INFO: '.green + filename + '.cpp created');
-				if (envData.cmd === 'g++') {
-
+				console.log('INFO: '.green + filename + '.c created');
+				if (envData.cmd == 'gcc') {
 					//compile c code 
-					compileCommand = 'g++ ' + path + filename + '.cpp -o ' + path + filename + '.exe';
-					exec(compileCommand, function(error, stdout, stderr) {
+					commmand = 'gcc ' + path + filename + '.c -o ' + path + filename + '.out';
+					exec(commmand, function(error, stdout, stderr) {
 						if (error) {
 							if (exports.stats) {
-								console.log('INFO: '.green + filename + '.cpp contained an error while compiling');
+								console.log('INFO: '.green + filename + '.c contained an error while compiling');
+
 							}
 							var out = {
 								error: stderr
 							};
 							fn(out);
+
 						} else {
-							var runCommand = path + filename + '.exe';
-							
 							if (input) {
 								var inputfile = filename + 'input.txt';
 
@@ -38,75 +40,103 @@ exports.compileCPP = function(envData, code, input, fn) {
 									if (exports.stats) {
 										if (err) console.log('ERROR: '.red + err);
 										else console.log('INFO: '.green + inputfile + ' (inputfile) created');
+
 									}
+
 								});
 
-								exec(runCommand + '<' + path + inputfile, function(error, stdout, stderr) {
+								exec(path + filename + '.out' + ' < ' + path + inputfile, function(error, stdout, stderr) {
 									if (error) {
+
 										if (error.toString().indexOf('Error: stdout maxBuffer exceeded.') != -1) {
 											var out = {
 												error: 'Error: stdout maxBuffer exceeded. You might have initialized an infinite loop.'
 											};
 											fn(out);
+
 										} else {
 											if (exports.stats) {
-												console.log('INFO: '.green + filename + '.cpp contained an error while executing');
+												console.log('INFO: '.green + filename + '.c contained an error while executing');
+
 											}
 											var out = {
-												error: stderr
+												output: stderr
 											};
 											fn(out);
+
 										}
+
 									} else {
 										if (exports.stats) {
-											console.log('INFO: '.green + filename + '.cpp successfully compiled and executed !');
+											console.log('INFO: '.green + filename + '.c successfully compiled and executed !');
+
 										}
 										var out = {
 											output: stdout
 										};
 										fn(out);
+
 									}
+
 								});
 
-							} else { //input not provided 
-								exec(runCommand, function(error, stdout, stderr) {
+
+							} else { 	//no input file
+									exec(path + filename + '.out', function(error, stdout, stderr) {
 									if (error) {
+
 										if (error.toString().indexOf('Error: stdout maxBuffer exceeded.') != -1) {
 											var out = {
 												error: 'Error: stdout maxBuffer exceeded. You might have initialized an infinite loop.'
 											};
 											fn(out);
+
 										} else {
 											if (exports.stats) {
-												console.log('INFO: '.green + filename + '.cpp contained an error while executing');
+												console.log('INFO: '.green + filename + '.c contained an error while executing');
+
 											}
 											var out = {
-												error: stderr
+												output: stderr
 											};
 											fn(out);
+
 										}
+
 									} else {
 										if (exports.stats) {
-											console.log('INFO: '.green + filename + '.cpp successfully compiled and executed !');
+											console.log('INFO: '.green + filename + '.c successfully compiled and executed !');
+
 										}
 										var out = {
 											output: stdout
 										};
 										fn(out);
+
 									}
+
 								});
+
 
 							}
 
 						}
 
-
 					});
 
 				} else {
 					console.log('ERROR: '.red + 'choose either g++ or gcc ');
+
 				}
-			} //end of else err	    	
-		} //end of exports.stats
-	}); //end of write file 							
-} //end of compileCPPWithInput
+
+			}
+			//end of else err	    	
+
+		}
+		//end of exports.stats
+
+	});
+	//end of write file 							
+
+}
+//end of compileC
