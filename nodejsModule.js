@@ -5,24 +5,21 @@ var colors = require('colors');
 
 exports.stats = false ;
 
-exports.compilePython = function( envData , code , input ,  fn){
+exports.compileJs = function( envData , code , input ,  fn){
 	var filename = cuid.slug();
 	path = './temp/';
 
-	fs.writeFile( path  +  filename +'.py' , code  , function(err ){			
-		if(exports.stats)
-		{
+	fs.writeFile( path  +  filename +'.js' , code, (err) => {			
+		if(exports.stats) {
 			if(err)
 			console.log('ERROR: '.red + err);
 		    else
-		    console.log('INFO: '.green + filename +'.py created');	
+		    console.log('INFO: '.green + filename +'.js created');	
 		}
-		if(!err)
-		{
+		if(!err) {
 
-			fs.writeFile(path + filename + 'input.txt' , input , function(err){
-				if(exports.stats)
-				{
+			fs.writeFile(path + filename + 'input.txt' , input , (err) => {
+				if(exports.stats) {
 					if(err)
 					console.log('ERROR: '.red + err);
 				    else
@@ -31,8 +28,8 @@ exports.compilePython = function( envData , code , input ,  fn){
 				if(!err)
 				{
 					if(input){
-						var command = 'python ' + path + filename +'.py < ' + path + filename +'input.txt ' ;
-						exec( command , function ( error , stdout , stderr ){
+						var command = 'node ' + path + filename +'.js < ' + path + filename + 'input.txt' ;
+						exec(command, (error , stdout , stderr) => {
 							if(error)
 							{
 								if(error.toString().indexOf('Error: stdout maxBuffer exceeded.') != -1)
@@ -44,7 +41,7 @@ exports.compilePython = function( envData , code , input ,  fn){
 								{
 									if(exports.stats)
 									{
-										console.log('INFO: '.green + filename + '.py contained an error while executing');
+										console.log('INFO: '.green + filename + '.js contained an error while executing.');
 									}
 									var out = { error : stderr };
 									fn(out);								
@@ -54,7 +51,7 @@ exports.compilePython = function( envData , code , input ,  fn){
 							{
 								if(exports.stats)
 								{
-									console.log('INFO: '.green + filename + '.py successfully executed !');
+									console.log('INFO: '.green + filename + '.js successfully executed!');
 								}
 								var out = { output : stdout};
 								fn(out);
@@ -63,8 +60,8 @@ exports.compilePython = function( envData , code , input ,  fn){
 						
 					}
 					else{
-						var command = 'python ' + path + filename +'.py';
-						exec( command , function ( error , stdout , stderr ){
+						var command = 'node ' + path + filename +'.js';
+						exec(command, (error , stdout , stderr) => {
 							if(error)
 							{
 								if(error.toString().indexOf('Error: stdout maxBuffer exceeded.') != -1)
@@ -76,7 +73,7 @@ exports.compilePython = function( envData , code , input ,  fn){
 								{
 									if(exports.stats)
 									{
-										console.log('INFO: '.green + filename + '.py contained an error while executing');
+										console.log('INFO: '.green + filename + '.js contained an error while executing');
 									}
 										var out = { error : stderr };
 										fn(out);								
@@ -86,7 +83,7 @@ exports.compilePython = function( envData , code , input ,  fn){
 							{
 								if(exports.stats)
 								{
-									console.log('INFO: '.green + filename + '.py successfully executed !');
+									console.log('INFO: '.green + filename + '.js successfully executed!');
 								}
 								var out = { output : stdout};
 								fn(out);

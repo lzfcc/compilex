@@ -2,12 +2,13 @@ var exec = require('child_process').exec;
 var fs = require('fs');
 var cuid = require('cuid');
 var colors = require('colors');
-var cModule = require('./cModule.js');
-var cppModule = require('./cppModule.js');
-var javaModule = require('./javaModule.js');
-var pyModule = require('./pyModule.js');
-var csModule = require('./csModule.js');
-var vbModule = require('./vbModule.js');
+var cModule = require('./cModule');
+var cppModule = require('./cppModule');
+var javaModule = require('./javaModule');
+var pyModule = require('./pyModule');
+var csModule = require('./csModule');
+var vbModule = require('./vbModule');
+var nodejsModule = require('./nodejsModule')
 
 
 exports.stats = false;
@@ -50,15 +51,9 @@ exports.compileJavaWithInput = function(envData, code, input, fn) {
 	javaModule.compileJavaWithInput(envData, code, input, fn);
 }
 
-exports.compilePython = function(envData, code, fn) {
+exports.compilePython = function(envData, code, input, fn) {
 	if (exports.stats) pyModule.stats = true;
-	pyModule.compilePython(envData, code, fn);
-}
-
-exports.compilePythonWithInput = function(envData, code, input, fn) {
-	if (exports.stats) pyModule.stats = true;
-	pyModule.compilePythonWithInput(envData, code, input, fn);
-
+	pyModule.compilePython(envData, code, input, fn);
 }
 
 exports.compileCS = function(envData, code, fn) {
@@ -80,6 +75,12 @@ exports.compileVBWithInput = function(envData, code, input, fn) {
 	if (exports.stats) vbModule.stats = true;
 	vbModule.compileVBWithInput(envData, code, input, fn);
 }
+
+exports.compileNodejs = function(envData, code, input, fn) {
+	if (exports.stats) vbModule.stats = true;
+	nodejsModule.compileJs(envData, code, input, fn);
+}
+
 
 exports.flushSync = function() {
 	path = './temp/';
