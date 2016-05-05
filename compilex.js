@@ -20,13 +20,17 @@ exports.init = function(option) {
 			exports.stats = true;
 		}
 	}
-	fs.exists('./temp', function(exists) {
-		if (!exists) {
-			if (exports.stats) {
+	fs.stat('./temp', function(err, stat) {
+	    if(err == null) {
+	        console.log('/temp directory exists');
+	    } 
+	    else {
+	    	console.log('Error: '.red, err.code); //if not exist: Error NO ENTry
+	        if (exports.stats) {
 				console.log('INFO: '.cyan + 'temp directory created for storing temporary files.'.cyan)
 			}
 			fs.mkdirSync('./temp');
-		}
+	    }
 	});
 }
 
@@ -77,7 +81,7 @@ exports.compileVBWithInput = function(envData, code, input, fn) {
 }
 
 exports.compileNodejs = function(envData, code, input, fn) {
-	if (exports.stats) vbModule.stats = true;
+	if (exports.stats) nodejsModule.stats = true;
 	nodejsModule.compileJs(envData, code, input, fn);
 }
 

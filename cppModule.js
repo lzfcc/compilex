@@ -49,67 +49,12 @@ exports.compileCPP = function(envData, code, input, fn) {
 								console.log('INFO: '.green + inputfile + ' (inputfile) created');
 							}
 							
-							exec(runCommand + '<' + path + inputfile, (error, stdout, stderr) => {
-								if (error) {
-									if (error.toString().indexOf('Error: stdout maxBuffer exceeded.') != -1) {
-										var out = {
-											error: 'Error: stdout maxBuffer exceeded. You might have initialized an infinite loop.'
-										};
-										fn(out);
-									} 
-									else {
-										if (exports.stats) {
-											console.log('INFO: '.green + filename + '.cpp contained an error while executing');
-										}
-										var out = {
-											error: stderr
-										};
-										fn(out);
-									}
-									return;
-								}
-								
-								if (exports.stats) {
-									console.log('INFO: '.green + filename + '.cpp successfully compiled and executed !');
-								}
-								var out = {
-									output: stdout
-								};
-								fn(out);
-							
-							});
+							execute(runCommand + '<' + path + inputfile, filename, fn);
 						});
 	
 					} 
 					else { //input not provided 
-						exec(runCommand, (error, stdout, stderr) => {
-							if (error) {
-								if (error.toString().indexOf('Error: stdout maxBuffer exceeded.') != -1) {
-									var out = {
-										error: 'Error: stdout maxBuffer exceeded. You might have initialized an infinite loop.'
-									};
-									fn(out);
-								} else {
-									if (exports.stats) {
-										console.log('INFO: '.green + filename + '.cpp contained an error while executing');
-									}
-									var out = {
-										error: stderr
-									};
-									fn(out);
-								}
-								return;
-							} 
-							if (exports.stats) {
-								console.log('INFO: '.green + filename + '.cpp successfully compiled and executed !');
-							}
-							var out = {
-								output: stdout
-							};
-							fn(out);
-							
-						});
-	
+						execute(runCommand, filename, fn);
 					}
 
 					//end of else err
@@ -123,3 +68,35 @@ exports.compileCPP = function(envData, code, input, fn) {
 		} //end of exports.stats
 	}); //end of write file 							
 } //end of compileCPPWithInput
+
+function execute(command, filename, fn){
+	exec(command, (error, stdout, stderr) => {
+		if (error) {
+			if (error.toString().indexOf('Error: stdout maxBuffer exceeded.') != -1) {
+				var out = {
+					error: 'Error: stdout maxBuffer exceeded. You might have initialized an infinite loop.'
+				};
+				fn(out);
+	
+			} else {
+				if (exports.stats) {
+					console.log('INFO: '.green + filename + '.c contained an error while executing');
+				}
+				var out = {
+					output: stderr
+				};
+				fn(out);
+	
+			}
+			return;
+		}
+		if (exports.stats) {
+			console.log('INFO: '.green + filename + '.c successfully compiled and executed!');
+		}
+		var out = {
+			output: stdout
+		};
+		fn(out);
+			
+	});
+}
